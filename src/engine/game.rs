@@ -85,7 +85,6 @@ impl Game {
                     }
                 }
             }
-            println!("Entries: {}", entries);
             if entries == 0 {
                 return Option::None;
             }
@@ -93,7 +92,6 @@ impl Game {
         };
 
         for condition in winning_conditions {
-            println!("Checking condition: {:?}", condition);
             // Check if there's any line
             let row = Game::int2row(condition[0]);
             let col = Game::int2col(condition[0]);
@@ -116,21 +114,12 @@ impl Game {
                 },
                 _ => movement::Move::Empty,
             });
-            println!(
-                "Winner: {:?}",
-                match winner {
-                    Option::Some(movement::Move::X) => "X",
-                    Option::Some(movement::Move::O) => "O",
-                    _ => "Empty",
-                }
-            );
             match winner {
                 Option::Some(movement::Move::X) => return Option::Some(state::State::XWon),
                 Option::Some(movement::Move::O) => return Option::Some(state::State::OWon),
                 _ => (),
             }
         }
-        println!("Entries: {:?}", entries);
         if entries == 9 {
             Option::Some(state::State::Draw)
         } else {
