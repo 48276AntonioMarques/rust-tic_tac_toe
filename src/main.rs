@@ -12,8 +12,8 @@ fn main() {
         while awaiting_input {
             // Check for winner
             if let Some(winner) = engine::check_winner(&game) {
-                println!("{} wins!", winner);
-                break;
+                println!("{}!", winner);
+                return;
             }
             // Get input from player
             engine::ask_input(&game);

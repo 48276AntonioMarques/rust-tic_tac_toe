@@ -1,8 +1,9 @@
 pub mod movement;
 pub mod player;
+pub mod state;
 
 pub struct Game {
-    pub winner: Option<player::Player>,
+    pub winner: Option<state::State>,
     pub current_player: player::Player,
     pub board: [[movement::Move; 3]; 3],
 }
@@ -17,6 +18,7 @@ impl Game {
     }
 
     pub fn play(&self, number: usize) -> Result<Game, String> {
+        // Check if game is over
         if !matches!(self.winner, Option::None) {
             return Result::Ok(Game {
                 winner: self.winner,
@@ -24,17 +26,28 @@ impl Game {
                 board: self.board,
             });
         }
+        // Check if input is valid
         let square = self.board[Game::int2row(number)][Game::int2col(number)];
         if !matches!(square, movement::Move::Empty) {
             return Result::Err("Invalid move. Square is already taken.".to_string());
         }
+        // Make move
         let new_square = match self.current_player {
             player::Player::X => movement::Move::X,
             player::Player::O => movement::Move::O,
         };
+        // Updating board
         let mut new_board = self.board;
         new_board[Game::int2row(number)][Game::int2col(number)] = new_square;
-        let winner = self.check_winner();
+        let new_game = Game {
+            winner: self.winner,
+            current_player: self.current_player.switch(),
+            board: new_board,
+        };
+        // Check for winner
+        // FIXME: Don't create a new game just to check for the winner
+        let winner = new_game.check_winner();
+        // Return new game state
         Result::Ok(Game {
             winner,
             current_player: self.current_player.switch(),
@@ -50,7 +63,7 @@ impl Game {
         (number - 1) % 3
     }
 
-    pub fn check_winner(&self) -> Option<player::Player> {
+    pub fn check_winner(&self) -> Option<state::State> {
         let winning_conditions = [
             [1, 2, 3],
             [4, 5, 6],
@@ -62,15 +75,26 @@ impl Game {
             [3, 5, 7],
         ];
         let board = self.board;
-        for row in board {
-            for square in row {
-                if matches!(square, movement::Move::Empty) {
-                    return Option::None;
+        // Check if all square are empty
+        let entries = {
+            let mut entries = 9;
+            for row in board {
+                for square in row {
+                    if matches!(square, movement::Move::Empty) {
+                        entries -= 1;
+                    }
                 }
             }
-        }
+            println!("Entries: {}", entries);
+            if entries == 0 {
+                return Option::None;
+            }
+            entries
+        };
 
         for condition in winning_conditions {
+            println!("Checking condition: {:?}", condition);
+            // Check if there's any line
             let row = Game::int2row(condition[0]);
             let col = Game::int2col(condition[0]);
             let square0: movement::Move = board[row][col];
@@ -80,23 +104,37 @@ impl Game {
             let row2 = Game::int2row(condition[2]);
             let col2 = Game::int2col(condition[2]);
             let square2 = board[row2][col2];
-            let squares = [square1, square2];
-            let mut all_same = 0;
-            for sqr in squares {
-                all_same = match sqr {
-                    movement::Move::Empty => 0,
-                    square0 => all_same + 1,
-                    _ => 0,
+            let squares = [square0, square1, square2];
+            let winner = squares.into_iter().reduce(|acc, _sqr| match acc {
+                movement::Move::X => match _sqr {
+                    movement::Move::X => movement::Move::X,
+                    _ => movement::Move::Empty,
+                },
+                movement::Move::O => match _sqr {
+                    movement::Move::O => movement::Move::O,
+                    _ => movement::Move::Empty,
+                },
+                _ => movement::Move::Empty,
+            });
+            println!(
+                "Winner: {:?}",
+                match winner {
+                    Option::Some(movement::Move::X) => "X",
+                    Option::Some(movement::Move::O) => "O",
+                    _ => "Empty",
                 }
-            }
-            if all_same == 2 {
-                return match square0 {
-                    movement::Move::X => Option::Some(player::Player::X),
-                    movement::Move::O => Option::Some(player::Player::O),
-                    _ => Option::None,
-                };
+            );
+            match winner {
+                Option::Some(movement::Move::X) => return Option::Some(state::State::XWon),
+                Option::Some(movement::Move::O) => return Option::Some(state::State::OWon),
+                _ => (),
             }
         }
-        Option::None
+        println!("Entries: {:?}", entries);
+        if entries == 9 {
+            Option::Some(state::State::Draw)
+        } else {
+            Option::None
+        }
     }
 }

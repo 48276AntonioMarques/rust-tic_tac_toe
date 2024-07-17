@@ -1373,6 +1373,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "reduce"
+version = "0.1.5+deprecated"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "feff7c275fbc4a96ccdc240a5a180487a61a31baffaff6cdd4fb2c8e9e0a2ecd"
+
+[[package]]
 name = "regex"
 version = "1.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1663,6 +1669,7 @@ name = "tic_tac_toe"
 version = "0.1.0"
 dependencies = [
  "cargo-watch",
+ "reduce",
 ]
 
 [[package]]
