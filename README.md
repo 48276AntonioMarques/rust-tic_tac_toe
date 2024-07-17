@@ -9,4 +9,4 @@ Have an TUI (Terminal User Interface) in which is possible to play tic tac toe l
 ## Current Progress
 * Interface ✅
 * I/O ✅
-* Game logic [WIP] (winner checking not working yet.)
+* Game logic ✅
