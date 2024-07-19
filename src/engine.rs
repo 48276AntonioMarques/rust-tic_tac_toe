@@ -1,9 +1,27 @@
 use game::Game;
 
-pub mod game;
+use std::io::{self, Write};
 
-pub fn render_game(game: &game::Game) {
-    println!("Rendering game...");
+use crate::localization;
+
+pub mod game;
+pub mod score;
+
+pub fn render_game(game: &game::Game, score: &score::Score) {
+    // Print ANSI to clear the screen
+    println!("\x1B[2J");
+    // Print the score
+    let screen_width = 30;
+    let padding = (screen_width - 13) / 2;
+    for _ in 0..padding {
+        print!("-");
+    }
+    print!("  X {} - {} O  ", score.x_wins, score.o_wins);
+    for _ in 0..padding {
+        print!("-");
+    }
+    println!();
+    println!();
     for i in 0..3 {
         let row: [game::movement::Move; 3] = game.board[i];
         let pos0: String = row[0].to_string();
@@ -24,23 +42,62 @@ pub fn render_game(game: &game::Game) {
         } else {
             pos2
         };
+        // Print spaces to center the board
+        for _ in 0..10 {
+            print!(" ");
+        }
         println!("{} | {} | {}", text0, text1, text2);
+    }
+    println!();
+    if game.winner.is_none() {
+        // Print the current player
+        localization::print(localization::resource::Resource::NowPlaying);
+        println!(": {}", game.current_player);
+    } else {
+        println!();
+    }
+    // Print the status message
+    if let Some(message) = &game.message {
+        println!("{}", message);
     }
 }
 
-pub fn ask_input(game: &game::Game) {
-    let player = game.current_player.to_string();
-    println!("It's {}'s turn. Enter a number from 1 to 9. > ", player);
+pub fn ask_input() {
+    localization::print(localization::resource::Resource::EnterNumber);
+    print!(" > ");
+    io::stdout().flush().unwrap();
 }
 
 pub fn update_game(input: String, game: &game::Game) -> Result<Game, String> {
-    let number = input.trim().parse::<usize>().unwrap();
+    let number = input.trim().parse::<usize>().unwrap_or(10);
     match number {
         1..=9 => Game::play(game, number),
-        _ => Result::Err("Invalid input. Please enter a number from 1 to 9.".to_string()),
+        _ => Result::Err(localization::get_localizad_string(
+            localization::resource::Resource::InvalidInput,
+        )),
     }
 }
 
 pub fn check_winner(game: &game::Game) -> Option<game::state::State> {
     game.winner
+}
+
+pub fn update_score(winner: game::state::State, score: &score::Score) -> Option<score::Score> {
+    match winner {
+        game::state::State::XWon => Some(score::Score {
+            x_wins: score.x_wins + 1,
+            o_wins: score.o_wins,
+        }),
+        game::state::State::OWon => Some(score::Score {
+            x_wins: score.x_wins,
+            o_wins: score.o_wins + 1,
+        }),
+        _ => None,
+    }
+}
+
+pub fn get_input() -> String {
+    let mut buffer = String::new();
+    io::stdin().read_line(&mut buffer).unwrap();
+    buffer
 }

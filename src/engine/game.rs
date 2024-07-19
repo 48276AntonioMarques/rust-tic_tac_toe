@@ -1,3 +1,5 @@
+use crate::localization;
+
 pub mod movement;
 pub mod player;
 pub mod state;
@@ -6,6 +8,7 @@ pub struct Game {
     pub winner: Option<state::State>,
     pub current_player: player::Player,
     pub board: [[movement::Move; 3]; 3],
+    pub message: Option<String>,
 }
 
 impl Game {
@@ -14,6 +17,7 @@ impl Game {
             winner: Option::None,
             current_player: player::Player::X,
             board: [[movement::Move::Empty; 3]; 3],
+            message: Option::None,
         }
     }
 
@@ -24,12 +28,15 @@ impl Game {
                 winner: self.winner,
                 current_player: self.current_player,
                 board: self.board,
+                message: Option::None,
             });
         }
         // Check if input is valid
         let square = self.board[Game::int2row(number)][Game::int2col(number)];
         if !matches!(square, movement::Move::Empty) {
-            return Result::Err("Invalid move. Square is already taken.".to_string());
+            return Result::Err(localization::get_localizad_string(
+                localization::resource::Resource::InvalidMove,
+            ));
         }
         // Make move
         let new_square = match self.current_player {
@@ -43,6 +50,7 @@ impl Game {
             winner: self.winner,
             current_player: self.current_player.switch(),
             board: new_board,
+            message: Option::None,
         };
         // Check for winner
         // FIXME: Don't create a new game just to check for the winner
@@ -52,6 +60,7 @@ impl Game {
             winner,
             current_player: self.current_player.switch(),
             board: new_board,
+            message: Option::None,
         })
     }
 
