@@ -9,14 +9,16 @@ pub mod score;
 
 pub fn render_game(game: &game::Game, score: &score::Score) {
     // Print ANSI to clear the screen
-    println!("\x1B[2J");
+    println!("\x1B[1J");
+    // Print ANSI to move the cursor to the top left
+    println!("\x1B[H");
     // Print the score
     let screen_width = 30;
     let padding = (screen_width - 13) / 2;
     for _ in 0..padding {
         print!("-");
     }
-    print!("  X {} - {} O  ", score.x_wins, score.o_wins);
+    print!("  X-{} = {}-O  ", score.x_wins, score.o_wins);
     for _ in 0..padding {
         print!("-");
     }
@@ -53,8 +55,6 @@ pub fn render_game(game: &game::Game, score: &score::Score) {
         // Print the current player
         localization::print(localization::resource::Resource::NowPlaying);
         println!(": {}", game.current_player);
-    } else {
-        println!();
     }
     // Print the status message
     if let Some(message) = &game.message {
