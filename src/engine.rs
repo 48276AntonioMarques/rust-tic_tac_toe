@@ -1,11 +1,8 @@
-use game::Game;
+use crate::game;
+use crate::localization;
+use crate::score;
 
 use std::io::{self, Write};
-
-use crate::localization;
-
-pub mod game;
-pub mod score;
 
 pub fn render_game(game: &game::Game, score: &score::Score) {
     // Print ANSI to clear the screen
@@ -68,10 +65,10 @@ pub fn ask_input() {
     io::stdout().flush().unwrap();
 }
 
-pub fn update_game(input: String, game: &game::Game) -> Result<Game, String> {
+pub fn update_game(input: String, game: &game::Game) -> Result<game::Game, String> {
     let number = input.trim().parse::<usize>().unwrap_or(10);
     match number {
-        1..=9 => Game::play(game, number),
+        1..=9 => game::Game::play(game, number),
         _ => Result::Err(localization::get_localizad_string(
             localization::resource::Resource::InvalidInput,
         )),

@@ -1,14 +1,16 @@
 mod engine;
+mod game;
 mod localization;
+mod score;
 
 use std::io::{self, Write};
 
 fn main() {
     // Main game loop
-    let mut score = engine::score::Score::new();
+    let mut score = score::Score::new();
     loop {
         // Initialize game
-        let mut game: engine::game::Game = engine::game::Game::new();
+        let mut game: game::Game = game::Game::new();
         loop {
             // Render game
             engine::render_game(&game, &score);
