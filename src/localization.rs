@@ -15,13 +15,13 @@ impl Localization {
                 language::Language {
                     code: code::Code::En,
                     strings: [
-                        "Press any key to play again or 'x' to exit.",
+                        "Play Again",
                         "Now playing",
-                        "Enter a number between 1 and 9.",
-                        "Invalid input.",
                         "Invalid move. Square is already taken.",
                         "wins!",
                         "Draw!",
+                        "Exit",
+                        "Unable to start new game.",
                     ]
                     .iter()
                     .map(|s| s.to_string())
@@ -30,13 +30,13 @@ impl Localization {
                 language::Language {
                     code: code::Code::Pt,
                     strings: [
-                        "Clique alguma tecla ou 'x' para sair.",
+                        "Jogar novamente",
                         "A jogar",
-                        "Introduza um número entre 1 e 9.",
-                        "Valor inválido.",
                         "Jogada inválida. Quadrado já estava ocupado.",
                         "venceu!",
                         "Empate!",
+                        "Sair",
+                        "Não é possível iniciar um novo jogo.",
                     ]
                     .iter()
                     .map(|s| s.to_string())
@@ -80,7 +80,7 @@ pub fn get_localizad_string(resource: resource::Resource) -> String {
         Some(language) => {
             // Get localized string
             let string = localization.get_string(language, resource);
-            // Print localized string
+            // Output localized string
             match string {
                 Ok(s) => s,
                 Err(e) => e,
@@ -88,8 +88,4 @@ pub fn get_localizad_string(resource: resource::Resource) -> String {
         }
         None => "Language not found.".to_string(),
     }
-}
-
-pub fn print(resource: resource::Resource) {
-    print!("{}", get_localizad_string(resource));
 }

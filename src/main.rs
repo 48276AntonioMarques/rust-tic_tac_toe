@@ -1,49 +1,28 @@
-mod engine;
+use iced::{
+    window::{self, Position},
+    Application, Settings, Size,
+};
+
+mod contest;
 mod game;
 mod localization;
 mod score;
 
-use std::io::{self, Write};
-
-fn main() {
-    // Main game loop
-    let mut score = score::Score::new();
-    loop {
-        // Initialize game
-        let mut game: game::Game = game::Game::new();
-        loop {
-            // Render game
-            engine::render_game(&game, &score);
-            // Check for winner
-            if let Some(winner) = engine::check_winner(&game) {
-                println!("{}", winner);
-                let new_score = engine::update_score(winner, &score);
-                if let Some(s) = new_score {
-                    score = s;
-                }
-                // Finish current game
-                break;
-            }
-            // Get input from player
-            engine::ask_input();
-            let input = engine::get_input();
-            // Update game state
-            let update = engine::update_game(input, &game);
-            match update {
-                Ok(new_game) => {
-                    game = new_game;
-                }
-                Err(e) => {
-                    game.message = Some(e);
-                }
-            }
-        }
-        localization::print(localization::resource::Resource::PlayAgain);
-        print!(" > ");
-        io::stdout().flush().unwrap();
-        let input = engine::get_input();
-        if input.trim().to_ascii_lowercase() == "x" {
-            break;
-        }
-    }
+fn main() -> Result<(), iced::Error> {
+    let settings = Settings {
+        window: window::Settings {
+            position: Position::Centered,
+            size: Size {
+                width: 900.0,
+                height: 600.0,
+            },
+            min_size: Option::Some(Size {
+                width: 500.0,
+                height: 500.0,
+            }),
+            ..window::Settings::default()
+        },
+        ..Settings::default()
+    };
+    contest::Contest::run(settings)
 }

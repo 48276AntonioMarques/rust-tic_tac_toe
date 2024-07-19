@@ -1,11 +1,11 @@
 pub enum Resource {
     PlayAgain,
     NowPlaying,
-    EnterNumber,
-    InvalidInput,
     InvalidMove,
     Wins,
     Draw,
+    Exit,
+    UnableToStartNewGame,
 }
 
 impl Resource {

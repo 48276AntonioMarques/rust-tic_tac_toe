@@ -60,7 +60,21 @@ impl Game {
             winner,
             current_player: self.current_player.switch(),
             board: new_board,
-            message: Option::None,
+            message: match winner {
+                Option::Some(state::State::Draw) => Option::Some(
+                    localization::get_localizad_string(localization::resource::Resource::Draw),
+                ),
+                Option::Some(_) => Option::Some(
+                    self.current_player.to_string()
+                        + " "
+                        + localization::get_localizad_string(
+                            localization::resource::Resource::Wins,
+                        )
+                        .to_string()
+                        .as_str(),
+                ),
+                _ => Option::None,
+            },
         })
     }
 
@@ -102,9 +116,9 @@ impl Game {
 
         for condition in winning_conditions {
             // Check if there's any line
-            let row = Game::int2row(condition[0]);
-            let col = Game::int2col(condition[0]);
-            let square0: movement::Move = board[row][col];
+            let row0 = Game::int2row(condition[0]);
+            let col0 = Game::int2col(condition[0]);
+            let square0: movement::Move = board[row0][col0];
             let row1 = Game::int2row(condition[1]);
             let col1 = Game::int2col(condition[1]);
             let square1 = board[row1][col1];
