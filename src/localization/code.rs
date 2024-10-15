@@ -9,12 +9,16 @@ impl Code {
     }
 
     pub fn from_string(string: &str) -> Option<Code> {
-        match string {
+        let end = string.find('.');
+        let trimmed = match end {
+            Some(end) => &string[0..end],
+            None => string,
+        };
+        println!("{}", trimmed);
+        match trimmed {
             "en" => Option::Some(Code::En),
             "pt" => Option::Some(Code::Pt),
-            "pt-BR" => Option::Some(Code::Pt),
-            "pt-PT" => Option::Some(Code::Pt),
-            _ => Option::None,
+            _ => Option::Some(Code::En)
         }
     }
 }
